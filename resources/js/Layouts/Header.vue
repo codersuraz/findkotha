@@ -31,13 +31,6 @@
             preserveScroll: true,
             replace: true,
         });
-        // router.get(route(route().current()), {}, {
-        //     preserveState: true,
-        //     preserveScroll: true,
-        //     replace: true,
-        //     only: ['locale'],
-        //     data: { locale: locale }
-        // });
     };
 
     router.on('invalid', (event) => {
