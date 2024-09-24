@@ -1,10 +1,51 @@
 <script setup>
+    import { ref } from 'vue';
+    import { router, Link } from '@inertiajs/vue3';
     import ApplicationLogo from '@/Components/ApplicationLogo.vue';
     import Dropdown from '@/Components/Dropdown.vue';
     import Globe from '@/Icons/Globe.vue';
     import NepalFlag from '@/Icons/NepalFlag.vue';
     import UsFlag from '@/Icons/UsFlag.vue';
-    import { Link } from '@inertiajs/vue3';
+    import Modal from '@/Components/Modal.vue';
+    import LoginModal from '@/Pages/Auth/LoginModal.vue'; // Updated import
+    import RegisterModal from '@/Pages/Auth/RegisterModal.vue';
+
+    const showModal = ref(false);
+    const modalType = ref(''); // 'login' or 'register'
+
+    const openModal = (type) => {
+        modalType.value = type;
+        showModal.value = true;
+    };
+
+    const closeModal = () => {
+        showModal.value = false;
+    };
+
+    const switchLocale = (locale) => {
+        const currentQuery = route().params;
+        const newQuery = { ...currentQuery, locale };
+
+        router.get(route(route().current(), newQuery), {}, { 
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+        // router.get(route(route().current()), {}, {
+        //     preserveState: true,
+        //     preserveScroll: true,
+        //     replace: true,
+        //     only: ['locale'],
+        //     data: { locale: locale }
+        // });
+    };
+
+    router.on('invalid', (event) => {
+        event.preventDefault()
+        if (event.detail.response.status === 401) {
+            openModal('login');
+        }
+    });
 </script>
 
 <template>
@@ -14,7 +55,7 @@
                 <!-- Logo -->
                 <div class="flex-shrink-0">
                     <Link href="/">
-                        <ApplicationLogo class="w-32 text-[#e83d5f]" />
+                    <ApplicationLogo class="w-32 text-primary-500" />
                     </Link>
                 </div>
 
@@ -46,10 +87,10 @@
 
                 <!-- Navigation -->
                 <nav class="flex items-center space-x-1">
-                    <a
-                        href="#"
-                        class="inline-flex items-center px-4 py-3 h-10 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-full"
-                    >List your Room</a>
+                    <Link
+                        :href="route('listing.create')"
+                        class="inline-flex items-center px-4 py-3 h-10 text-sm font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-full"
+                    >List your Room</Link>
 
                     <!-- Language Switcher -->
                     <Dropdown>
@@ -62,20 +103,20 @@
                         </template>
                         <template #content>
                             <div class="py-1">
-                                <a
-                                    href="#"
-                                    class="flex items-center gap-0.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                <button
+                                    @click="switchLocale('ne')"
+                                    class="flex items-center w-full gap-0.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 >
-                                    <NepalFlag class="w-5"/>
+                                    <NepalFlag class="w-5" />
                                     नेपाली
-                                </a>
-                                <a
-                                    href="#"
-                                    class="flex items-center gap-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                </button>
+                                <button
+                                    @click="switchLocale('en')"
+                                    class="flex items-center w-full gap-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 >
-                                    <UsFlag class="w-4"/>
+                                    <UsFlag class="w-4" />
                                     English
-                                </a>
+                                </button>
                             </div>
                         </template>
                     </Dropdown>
@@ -84,40 +125,119 @@
                         class="relative"
                         v-if="$page.props.auth?.user"
                     >
-                        <button
-                            class="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none focus:text-gray-900"
-                        >
-                            <span class="sr-only">Open user menu</span>
-                            <img
-                                class="h-8 w-8 rounded-full"
-                                src="https://via.placeholder.com/32"
-                                alt="User avatar"
-                            >
-                        </button>
+                        <Dropdown>
+                            <template #trigger>
+                                <button
+                                    class="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none focus:text-gray-900"
+                                >
+                                    <span class="sr-only">Open user menu</span>
+                                    <img
+                                        class="h-8 w-8 rounded-full"
+                                        :src="$page.props.auth?.user?.profile_photo_url"
+                                        alt="User avatar"
+                                    >
+                                </button>
+                            </template>
+                            <template #content>
+                                <!-- This dropdown menu contains Messages, Notifications, WishList | Profile | Logout -->
+                                <div class="py-1">
+                                    <a
+                                        href="#"
+                                        class="flex items-center gap-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    >
+                                        <span class="sr-only">Messages</span>
+                                        <span class="text-sm font-medium text-gray-700">Messages</span>
+                                    </a>
+                                </div>
+                                <div class="py-1">
+                                    <a
+                                        href="#"
+                                        class="flex items-center gap-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    >
+                                        <span class="sr-only">Notifications</span>
+                                        <span class="text-sm font-medium text-gray-700">Notifications</span>
+                                    </a>
+                                </div>
+                                <div class="py-1">
+                                    <a
+                                        href="#"
+                                        class="flex items-center gap-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    >
+                                        <span class="sr-only">WishList</span>
+                                        <span class="text-sm font-medium text-gray-700">WishList</span>
+                                    </a>
+                                </div>
+                                <hr class="my-1" />
+                                <div class="py-1">
+                                    <a
+                                        href="#"
+                                        class="flex items-center gap-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    >
+                                        <span class="sr-only">Profile</span>
+                                        <span class="text-sm font-medium text-gray-700">Profile</span>
+                                    </a>
+                                </div>
+                                <hr class="my-1" />
+                                <div class="py-1">
+                                    <a
+                                        href="#"
+                                        class="flex items-center gap-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    >
+                                        <span class="sr-only">Logout</span>
+                                        <span class="text-sm font-medium text-gray-700">Logout</span>
+                                    </a>
+                                </div>
+                            </template>
+                        </Dropdown>
                     </div>
-                    <div class="relative flex items-center gap-1">
+                    <div
+                        v-else
+                        class="relative flex items-center gap-1"
+                    >
                         <button
                             class="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none focus:text-gray-900"
+                            @click.prevent="openModal('register')"
                         >
                             <span class="sr-only">Open signup menu</span>
-                            <Link
+                            <span
                                 href="/register"
                                 class="text-sm font-medium text-gray-700 hover:text-gray-900 inline-flex items-center px-4 py-3 h-10 hover:bg-gray-100 rounded-full"
                             >
-                            Signup</Link>
+                                Signup</span>
                         </button>
                         <button
                             class="flex items-center text-sm font-medium text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:bg-red-600 rounded-full px-4 py-2"
+                            @click.prevent="openModal('login')"
                         >
                             <span class="sr-only">Open login menu</span>
-                            <Link
+                            <span
                                 href="/login"
                                 class="text-sm font-medium text-white"
-                            >Login</Link>
+                            >Login</span>
                         </button>
                     </div>
                 </nav>
             </div>
         </div>
     </header>
+
+    <Modal
+        :show="showModal"
+        max-width="sm"
+        :center="true"
+        @close="closeModal"
+    >
+        <template v-if="modalType === 'login'">
+            <LoginModal
+                @switchModal="openModal('register')"
+                @closeModal="closeModal"
+            /> <!-- Updated to use LoginModal -->
+        </template>
+        <template v-else-if="modalType === 'register'">
+            <RegisterModal
+                @switchModal="openModal('login')"
+                @closeModal="closeModal"
+            />
+        </template>
+    </Modal>
 </template>

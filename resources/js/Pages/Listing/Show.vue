@@ -3,10 +3,10 @@ import { Head } from '@inertiajs/vue3';
 import Header from '@/Layouts/Header.vue';
 // Assume we receive the listing data as a prop
 const props = defineProps({
-    listing: {
-        type: Object,
-        required: true,
-    },
+    // listing: {
+    //     type: Object,
+    //     required: true,
+    // },
 });
 
 // Mock data for the example (replace with actual data from your backend)
