@@ -37,6 +37,11 @@ class HandleInertiaRequests extends Middleware
             ],
             'flash' => [
                 'message' => fn() => $request->session()->get('message'),
+                'modal' => [
+                    'show' => fn() => session('showModal'),
+                    'type' => fn() => session('modalType'),
+                    'intended' => fn() => session('intended'),
+                ],
             ],
             'locale' => session('locale'),
         ];

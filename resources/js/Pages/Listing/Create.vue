@@ -1,7 +1,7 @@
 <script setup>  
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import ArrowLeft from '@/Icons/ArrowLeft.vue';
-import { useForm } from '@inertiajs/vue3';
+import { router, useForm } from '@inertiajs/vue3';
 import { onMounted, onUnmounted, ref } from 'vue';
 import Onboarding from './Onboarding.vue';
 
@@ -19,10 +19,10 @@ const submit = () => {
     form.post('/listings');
 };
 
-const back = () => {
+const exit = () => {
     // ask user if they want to discard the listing
     if (confirm('Are you sure you want to discard the listing?')) {
-        router.visit('/listings');
+        router.visit('/');
     }
 };
 
@@ -46,16 +46,29 @@ onUnmounted(() => {
     <div class="flex flex-col h-screen">
         <header class="flex items-center justify-between flex-row-reverse md:flex-row px-10 pt-4">
             <ApplicationLogo class="text-primary-500 w-32"/>
-            <button @click="back" class="inline-flex items-center gap-1 px-4 py-2 font-medium text-gray-800 active:scale-95 transition duration-100 ease-in-out border border-gray-300 rounded-lg">
+            <button @click="exit" class="inline-flex items-center gap-1 px-4 py-2 font-medium text-gray-800 active:scale-95 transition duration-100 ease-in-out border border-gray-300 rounded-lg">
                 <ArrowLeft class="size-4 " />
-                Back
+                Exit
             </button>
         </header>
 
-        <div class="main-content flex-1 h-full ">
+        <div class="main-content flex-1 h-full overflow-y-auto">
 
             <!-- Onboarding -->
             <Onboarding v-if="step === 0" />
+
+            <!-- Listing Form -->
+            <div v-if="step === 1" class="max-w-[1200px] mx-auto h-full">
+                <div class="flex items-center">
+                    <div class="flex-1 h-full">
+                        <h2>Tell us about your place</h2>
+                        <p>Share some basic information about your place to help guests understand what you have to offer.</p>
+                    </div>
+                    <div class="flex-1">
+                        
+                    </div>
+                </div>
+            </div>
 
 
         </div>

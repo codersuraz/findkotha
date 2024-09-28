@@ -12,6 +12,7 @@
     const form = useForm({
         email: '',
         password: '',
+        remember: false,
     });
 
     const handleLogin = () => {

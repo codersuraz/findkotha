@@ -6,20 +6,16 @@
     import Globe from '@/Icons/Globe.vue';
     import NepalFlag from '@/Icons/NepalFlag.vue';
     import UsFlag from '@/Icons/UsFlag.vue';
-    import Modal from '@/Components/Modal.vue';
-    import LoginModal from '@/Pages/Auth/LoginModal.vue'; // Updated import
-    import RegisterModal from '@/Pages/Auth/RegisterModal.vue';
+    import AuthModal from '@/Layouts/AuthModal.vue';
 
     const showModal = ref(false);
-    const modalType = ref(''); // 'login' or 'register'
+    const modalType = defineModel('type', {
+        default: 'login',
+    });
 
     const openModal = (type) => {
         modalType.value = type;
         showModal.value = true;
-    };
-
-    const closeModal = () => {
-        showModal.value = false;
     };
 
     const switchLocale = (locale) => {
@@ -32,13 +28,6 @@
             replace: true,
         });
     };
-
-    router.on('invalid', (event) => {
-        event.preventDefault()
-        if (event.detail.response.status === 401) {
-            openModal('login');
-        }
-    });
 </script>
 
 <template>
@@ -53,10 +42,11 @@
                 </div>
 
                 <!-- Search bar -->
-                <div class="flex-1 max-w-lg mx-4">
+                <form action="/search" class="flex-1 max-w-lg mx-4">
                     <div class="relative">
                         <input
                             type="text"
+                            name="q"
                             class="w-full border border-gray-300 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                             placeholder="Start your search"
                         >
@@ -76,12 +66,12 @@
                             </svg>
                         </div>
                     </div>
-                </div>
+                </form>
 
                 <!-- Navigation -->
                 <nav class="flex items-center space-x-1">
                     <Link
-                        :href="route('listing.create')"
+                        :href="route('listing.create.onboarding')"
                         class="inline-flex items-center px-4 py-3 h-10 text-sm font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-full"
                     >List your Room</Link>
 
@@ -214,23 +204,8 @@
         </div>
     </header>
 
-    <Modal
-        :show="showModal"
-        max-width="sm"
-        :center="true"
-        @close="closeModal"
-    >
-        <template v-if="modalType === 'login'">
-            <LoginModal
-                @switchModal="openModal('register')"
-                @closeModal="closeModal"
-            /> <!-- Updated to use LoginModal -->
-        </template>
-        <template v-else-if="modalType === 'register'">
-            <RegisterModal
-                @switchModal="openModal('login')"
-                @closeModal="closeModal"
-            />
-        </template>
-    </Modal>
+    <AuthModal
+        v-model="showModal"
+        v-model:type="modalType"
+    />
 </template>
